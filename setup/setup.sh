@@ -19,4 +19,19 @@ echo "Setting the kibana_system password"
 es POST /_security/user/kibana_system/_password \
   "{\"password\": \"${KIBANA_SYSTEM_PASSWORD}\"}"
 
+# Logstash writes with its own user, which can only append documents to
+# logs-* data streams.
+echo "Creating the logstash_writer role and user"
+es PUT /_security/role/logstash_writer "$(cat /setup/logstash-writer-role.json)"
+es PUT /_security/user/logstash_writer \
+  "{\"password\": \"${LOGSTASH_WRITER_PASSWORD}\", \"roles\": [\"logstash_writer\"], \"full_name\": \"Logstash writer\"}"
+
+# logs-*-* data streams use Elasticsearch's built-in "logs" index template,
+# which pulls in a logs@custom component template if one exists. Pointing
+# that at our ILM policy sets retention for every logs data stream.
+echo "Creating the retention policy"
+es PUT /_ilm/policy/logs-14d "$(cat /setup/ilm-policy.json)"
+es PUT /_component_template/logs@custom \
+  '{"template": {"settings": {"index.lifecycle.name": "logs-14d"}}}'
+
 echo "Setup complete"

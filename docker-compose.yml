@@ -29,6 +29,7 @@ services:
     environment:
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
       KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:?set KIBANA_SYSTEM_PASSWORD in .env}
+      LOGSTASH_WRITER_PASSWORD: ${LOGSTASH_WRITER_PASSWORD:?set LOGSTASH_WRITER_PASSWORD in .env}
     volumes:
       - ./setup:/setup:ro
     depends_on:

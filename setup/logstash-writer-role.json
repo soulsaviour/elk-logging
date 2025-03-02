@@ -1,0 +1,9 @@
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["logs-*-*"],
+      "privileges": ["auto_configure", "create_doc"]
+    }
+  ]
+}
