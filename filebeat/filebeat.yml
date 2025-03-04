@@ -1,0 +1,21 @@
+# Ships log files to Logstash. Each input sets log_source, which the
+# Logstash filter uses to pick a parser and a data stream.
+filebeat.inputs:
+  - type: filestream
+    id: nginx-access
+    paths:
+      - /var/log/demo/nginx/access.log*
+    fields_under_root: true
+    fields:
+      log_source: nginx
+
+  - type: filestream
+    id: app
+    paths:
+      - /var/log/demo/app/*.log
+    fields_under_root: true
+    fields:
+      log_source: app
+
+output.logstash:
+  hosts: ["logstash:5044"]

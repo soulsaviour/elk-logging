@@ -66,5 +66,22 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION:-9.5.5}
+    # Root to read log files owned by other users; config is mounted read-only,
+    # so the strict permission check on it is relaxed.
+    user: root
+    command: ["-e", "--strict.perms=false"]
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - demo-logs:/var/log/demo:ro
+      # The registry remembers how far each file was read across restarts.
+      - filebeat-data:/usr/share/filebeat/data
+    depends_on:
+      - logstash
+    restart: unless-stopped
+
 volumes:
   es-data:
+  filebeat-data:
+  demo-logs:
