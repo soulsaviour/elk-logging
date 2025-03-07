@@ -1,0 +1,5 @@
+{"log_source": "nginx", "message": "203.0.113.7 - - [29/Oct/2026:10:15:32 +0000] \"GET /items?page=2 HTTP/1.1\" 200 1534 \"https://shop.example.com/\" \"Mozilla/5.0 (X11; Linux x86_64; rv:131.0) Gecko/20100101 Firefox/131.0\""}
+{"log_source": "nginx", "message": "198.51.100.23 - alice [29/Oct/2026:10:15:40 +0000] \"POST /checkout HTTP/2.0\" 502 166 \"-\" \"curl/8.10.1\""}
+{"log_source": "nginx", "message": "this is not an access log line"}
+{"log_source": "app", "message": "{\"time\": \"2026-10-29T10:16:00.123Z\", \"level\": \"error\", \"msg\": \"payment provider timeout\", \"order_id\": \"A-1042\", \"duration_ms\": 30001}"}
+{"log_source": "app", "message": "plain text, not json"}
