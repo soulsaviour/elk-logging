@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate the Compose file
+        run: |
+          cp .env.example .env
+          docker compose --profile demo config --quiet
+
+  logstash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the full pipeline configuration
+        run: |
+          version=$(grep '^STACK_VERSION=' .env.example | cut -d= -f2)
+          docker run --rm -e LOGSTASH_WRITER_PASSWORD=ci \
+            -v "$PWD/logstash/pipeline:/usr/share/logstash/pipeline:ro" \
+            "docker.elastic.co/logstash/logstash:$version" \
+            logstash --config.test_and_exit -f /usr/share/logstash/pipeline/
+      - name: Run sample logs through the filter
+        run: tests/run.sh
+
+  filebeat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the Filebeat configuration
+        run: |
+          version=$(grep '^STACK_VERSION=' .env.example | cut -d= -f2)
+          docker run --rm -v "$PWD/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro" \
+            "docker.elastic.co/beats/filebeat:$version" \
+            filebeat test config --strict.perms=false
+
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: shellcheck setup/*.sh tests/run.sh
+      - run: pipx run ruff check --select E,F,I,B,UP --line-length 100 demo tests
